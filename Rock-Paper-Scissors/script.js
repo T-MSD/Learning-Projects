@@ -1,104 +1,106 @@
+// Seleciona os botões de ação e elementos de exibição
 const btnRock = document.querySelector('#rock');
 const btnPaper = document.querySelector('#paper');
 const btnScissors = document.querySelector('#scissors');
-const btnRestart = document.querySelector('#restartBtn')
-btnRock.addEventListener('click', () => getClick('rock'));
-btnPaper.addEventListener('click', () => getClick('paper'));
-btnScissors.addEventListener('click', () => getClick('scissors'));
-btnRestart.addEventListener('click', () => restartGame());
-
+const btnRestart = document.querySelector('#restartBtn');
 const pScore = document.querySelector('#pScore');
 const cScore = document.querySelector('#cScore');
 const tCounter = document.querySelector('#tCounter');
 const popup = document.querySelector('#popup');
 const container = document.querySelector('#container');
-const popupW = document.querySelector('#popupWinner')
+const popupW = document.querySelector('#popupWinner');
 
+// Inicializa as variáveis de pontuação
 let playerScore = 0;
 let computerScore = 0;
 let tieCounter = 0;
 
+// Adiciona eventos de clique para os botões
+btnRock.addEventListener('click', () => handlePlayerChoice('rock'));
+btnPaper.addEventListener('click', () => handlePlayerChoice('paper'));
+btnScissors.addEventListener('click', () => handlePlayerChoice('scissors'));
+btnRestart.addEventListener('click', restartGame);
+
+// Função para obter a escolha aleatória do computador
 function getComputerChoice() {
-  const randomNumber = Math.floor(Math.random() * 3);
-  switch (randomNumber) {
-  case 0:
-      return 'rock';
-  case 1:
-      return 'paper';
-  case 2:
-      return 'scissors';
+  const choices = ['rock', 'paper', 'scissors'];
+  const randomIndex = Math.floor(Math.random() * choices.length);
+  return choices[randomIndex];
+}
+
+// Função que gerencia a escolha do jogador
+function handlePlayerChoice(playerChoice) {
+  if (isGameOver()) return; // Verifica se o jogo já acabou
+  
+  const computerChoice = getComputerChoice();
+  const resultMessage = determineRoundOutcome(playerChoice, computerChoice);
+  
+  updateScores();
+  console.log(resultMessage);
+  
+  if (isGameOver()) {
+    displayFinalResult();
   }
 }
 
-function playRound(player) {
-  if (!endGame()){
-    const computer = getComputerChoice().toLowerCase();
-    const playerChoice = player.toLowerCase();
-    if (playerChoice === computer) {
-      tieCounter++;
-      return 'It\'s a tie!';
-    }
-    if (
-      (playerChoice === 'rock' && computer === 'scissors') || 
-      (playerChoice === 'paper' && computer === 'rock') ||
-      (playerChoice === 'scissors' && computer === 'paper')){
-      playerScore++;
-      return 'You win!';
-    } 
-    if (
-      (playerChoice === 'rock' && computer === 'paper') ||
-      (playerChoice === 'paper' && computer === 'scissors') ||
-      (playerChoice === 'scissors' && computer === 'rock')){
-      computerScore++;
-      return 'You lose!';
-    }
+// Determina o resultado da rodada
+function determineRoundOutcome(playerChoice, computerChoice) {
+  if (playerChoice === computerChoice) {
+    tieCounter++;
+    return 'It\'s a tie!';
+  }
+  
+  const winningConditions = {
+    rock: 'scissors',
+    paper: 'rock',
+    scissors: 'paper'
+  };
+
+  if (winningConditions[playerChoice] === computerChoice) {
+    playerScore++;
+    return 'You win!';
+  } else {
+    computerScore++;
+    return 'You lose!';
   }
 }
 
-function getClick(value){
-  const result = playRound(value);
-  updatePoints();
-  console.log(result);
-  if (endGame()){
-    displayResult();
-  }
-}
-
-function endGame(){
+// Verifica se o jogo acabou
+function isGameOver() {
   return playerScore === 5 || computerScore === 5;
 }
 
-function displayResult(){
+// Exibe o resultado final do jogo
+function displayFinalResult() {
   openPopup();
-  return playerScore > computerScore 
-  ?  popupW.textContent = 'Winner: Player'
-  :  popupW.textContent = 'Winner: Computer';
+  popupW.textContent = playerScore > computerScore ? 'Winner: Player' : 'Winner: Computer';
 }
 
-function updatePoints(){
+// Atualiza a exibição dos pontos
+function updateScores() {
   pScore.textContent = "Player Score: " + playerScore;
   cScore.textContent = "Computer Score: " + computerScore;
-  tCounter.textContent = 'Ties: ' + tieCounter
+  tCounter.textContent = 'Ties: ' + tieCounter;
 }
 
-function restartGame(){
+// Reinicia o jogo
+function restartGame() {
   closePopup();
   playerScore = 0;
   computerScore = 0;
   tieCounter = 0;
-  popupW.textContent = ''
-  tCounter.textContent = 'Ties: 0'
-  updatePoints();
+  popupW.textContent = '';
+  updateScores();
 }
 
+// Função para mostrar o popup
 function openPopup() {
   popup.classList.add("open-popup");
   container.classList.add("blur");
-  popup.classList.add("unblur");
 }
 
+// Função para fechar o popup
 function closePopup() {
   popup.classList.remove("open-popup");
   container.classList.remove("blur");
-  popup.classList.remove("unblur");
 }
