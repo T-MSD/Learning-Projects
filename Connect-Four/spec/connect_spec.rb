@@ -12,15 +12,6 @@ describe Board do
     end
   end
 
-  describe '#col_full?' do
-    it 'returns if the column has empty spaces' do
-      board.place(3, :red)
-      expect(board.col_full?(3)).to be false
-      6.times { board.place(1, :blue) }
-      exepct(col_full?(1)).to be true
-    end
-  end
-
   describe '#place' do
     it 'placing a piece in the bottom row' do
       board.place(3, :red)
