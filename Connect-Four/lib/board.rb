@@ -27,6 +27,14 @@ class Board
     @board[0].none?(&:nil?) # No nil in the top row means the board is full
   end
 
+  def board_empty?
+    @board.flatten.all?(&:nil?)
+  end
+
+  def reset_board
+    @board = Array.new(6) { Array.new(7, nil) }
+  end
+
   def print_board
     @board.each do |row|
       puts '  ' + row.map { |cell| cell.nil? ? '⚪' : cell }.join(' ')
