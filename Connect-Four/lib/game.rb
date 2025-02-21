@@ -1,9 +1,13 @@
 # frozen_string_literal: true
 
-require_relative 'board'
+# Class Game
+class Game
+  attr_reader :colors
 
-board = Board.new
-
-board.place(3, :red)
-board.place(3, :blue)
-board.print_board
+  def initialize
+    @colors = {
+      red: '🔴',
+      blue: '🔵'
+    }
+  end
+end
