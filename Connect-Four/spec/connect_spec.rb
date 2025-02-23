@@ -124,27 +124,34 @@ describe Game do
       (0..3).each do |i|
         board.place(i, game.colors[:red])
       end
-      expect(game.is_win?).to be true
+      board.print_board
+      expect(game.win?('🔴')).to be true
     end
 
     it 'vetical win' do
       board = Board.new
       game = Game.new(board)
       4.times { board.place(1, game.colors[:red]) }
-      expect(game.is_win?).to be true
+      board.print_board
+      expect(game.win?('🔴')).to be true
     end
 
-    it "diagonal win '\'" do
+    it 'diagonal win "\"' do
       board = Board.new
       game = Game.new(board)
       (0..3).each do |i|
-        board[i][i] = '🔴'
+        board.board[i][i] = '🔴'
       end
-      expect(game.is_win?). to be true
+      expect(game.win?('🔴')).to be true
     end
 
-    it "diagonal win '/'" do
-      
+    it 'diagonal win "/"' do
+      board = Board.new
+      game = Game.new(board)
+      5.downto(2) do |i|
+        board.board[i][5 - i] = '🔴'
+      end
+      expect(game.win?('🔴')).to be true
     end
   end
 end
