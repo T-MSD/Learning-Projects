@@ -31,6 +31,10 @@ class Board
     @board.flatten.all?(&:nil?)
   end
 
+  def empty_cell?(row, col)
+    @board[row][col].nil?
+  end
+
   def reset_board
     @board = Array.new(6) { Array.new(7, nil) }
   end

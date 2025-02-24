@@ -2,15 +2,13 @@
 
 # Class Game
 class Game
-  attr_reader :colors, :winner, :board
+  attr_reader :winner, :board, :p1, :p2
 
-  def initialize(board)
-    @colors = {
-      red: '🔴',
-      blue: '🔵'
-    }
+  def initialize(board, player1 = nil, player2 = nil)
     @board = board
     @winner = nil
+    @p1 = player1
+    @p2 = player2
   end
 
   def reset
@@ -36,5 +34,31 @@ class Game
       end
     end
     false
+  end
+
+  # TODO: Refactor this func
+  def prompt
+    text = ['Enter row:', 'Enter column:']
+    coord = []
+    i = 0
+    while i < 2
+      puts text[i]
+      input = gets.chomp
+      if i.zero? && input.to_i.between?(0, 5)
+        i += 1
+        coord.append(input.to_i)
+      elsif i == 1 && input.to_i.between?(0, 6)
+        i += 1
+        coord.append(input.to_i)
+        unless @board.empty_cell?(coord[0], coord[1])
+          i = 0
+          coord = []
+          puts 'Position not empty!'
+        end
+      else
+        puts 'Invalid number, row between 0 and 5, column between 0 and 6'
+      end
+    end
+    coord
   end
 end
