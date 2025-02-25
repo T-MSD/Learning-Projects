@@ -16,7 +16,6 @@ describe Board do
 
   describe '#place' do
     board = Board.new
-    game = Game.new(board)
     it 'placing a piece in the bottom row' do
       board.place(3, '🔴')
       expect(board.board[5][3]).to eq('🔴')
@@ -40,7 +39,6 @@ describe Board do
 
   describe '#board_full?' do
     board = Board.new
-    game = Game.new(board)
     it 'Returns false if board is not full' do
       expect(board.board_full?).to be false
     end
@@ -61,7 +59,6 @@ describe Board do
 
     it 'returns false if at least one piece is placed' do
       board = Board.new
-      game = Game.new(board)
       board.place(1, '🔴')
       expect(board.board_empty?).to be false
     end
@@ -70,7 +67,6 @@ describe Board do
   describe '#reset_board' do
     it 'resets the board, every cell is nil' do
       board = Board.new
-      game = Game.new(board)
       board.place(3, '🔴')
       board.reset_board
       expect(board.board_empty?).to be true
@@ -82,8 +78,6 @@ end
 describe Player do
   describe '#initialize' do
     it 'creates an instance with desired color' do
-      board = Board.new
-      game = Game.new(board)
       player = Player.new('🔵')
       expect(player.color).to eq('🔵')
     end
@@ -92,37 +86,21 @@ end
 
 # Game Tests
 describe Game do
+  player1 = Player.new('🔴')
+  player2 = Player.new('🔵')
   describe '#initialize' do
     it 'creates a game instance' do
       board = Board.new
-      player1 = Player.new('🔴')
-      player2 = Player.new('🔵')
       game = Game.new(board, player1, player2)
       expect(game.p1.color).to eq('🔴')
       expect(game.p2.color).to eq('🔵')
     end
   end
 
-  describe '#reset' do
-    board = Board.new
-    game = Game.new(board)
-    board.place(1, '🔴')
-    game.reset
-    it 'Overides the 2d array' do
-      expect(board.board).to be_an(Array)
-      expect(board.board).to all(be_an(Array))
-    end
-
-    it 'resets board and winner' do
-      expect(board.board_empty?).to be true
-      expect(game.winner).to be nil
-    end
-  end
-
-  describe '#is_win?' do
+  describe '#win?' do
     it 'horizontal win' do
       board = Board.new
-      game = Game.new(board)
+      game = Game.new(board, player1, player2)
       (0..3).each do |i|
         board.place(i, '🔴')
       end
@@ -131,14 +109,14 @@ describe Game do
 
     it 'vetical win' do
       board = Board.new
-      game = Game.new(board)
+      game = Game.new(board, player1, player2)
       4.times { board.place(1, '🔴') }
       expect(game.win?('🔴')).to be true
     end
 
     it 'diagonal win "\"' do
       board = Board.new
-      game = Game.new(board)
+      game = Game.new(board, player1, player2)
       (0..3).each do |i|
         board.board[i][i] = '🔴'
       end
@@ -147,7 +125,7 @@ describe Game do
 
     it 'diagonal win "/"' do
       board = Board.new
-      game = Game.new(board)
+      game = Game.new(board, player1, player2)
       5.downto(2) do |i|
         board.board[i][5 - i] = '🔴'
       end
@@ -155,49 +133,64 @@ describe Game do
     end
   end
 
-  describe '#empty_cell?' do
+  describe '#empty_col?' do
     board = Board.new
-    it 'returns true if cell [i][j] is empty' do
-      expect(board.empty_cell?(5, 1)).to be true
+    it 'returns true if column is empty' do
+      expect(board.empty_col?(1)).to be true
     end
 
-    it 'returns false if cell [i][j] is not empty' do
-      board.place(1, '🔴')
-      expect(board.empty_cell?(5, 1)).to be false
+    it 'returns false if column is full' do
+      6.times { board.place(1, '🔴') }
+      expect(board.empty_col?(1)).to be false
+    end
+  end
+
+  describe '#reset?' do
+    let(:player1) { double('Player', color: '🔴') }
+    let(:player2) { double('Player', color: '🔵') }
+    let(:board) { double('Board') }
+    let(:game) { Game.new(board, player1, player2) }
+
+    it 'returns true if input = yes' do
+      allow(game).to receive(:gets).and_return("yes\n")
+      expect(game.reset?).to be true
+    end
+
+    it 'returns true if input = yes' do
+      allow(game).to receive(:gets).and_return("no\n")
+      expect(game.reset?).to be false
     end
   end
 
   describe '#prompt' do
-    let(:board) { instance_double(Board) }
-    let(:game) { Game.new(board) }
+    player1 = Player.new('🔴')
+    player2 = Player.new('🔵')
+    board = Board.new
+    game = Game.new(board, player1, player2)
 
     before do
-      allow(game).to receive(:write)  # Suppress console output
-      allow(board).to receive(:empty_cell?).and_return(true) # Default stub to avoid unexpected arguments
+      allow(game).to receive(:write) # Suppress console output
+      allow(board).to receive(:empty_col?).and_return(true) # Default stub to avoid unexpected arguments
     end
 
     it 'returns valid row and column when input is correct' do
-      allow(board).to receive(:empty_cell?).with(2, 3).and_return(true)
-      allow(game).to receive(:gets).and_return("2\n", "3\n")
-      expect(game.prompt).to eq([2, 3])
-    end
-
-    it 'rejects invalid row input and asks again' do
-      allow(board).to receive(:empty_cell?).with(2, 3).and_return(true)
-      allow(game).to receive(:gets).and_return("7\n", "2\n", "3\n")
-      expect(game.prompt).to eq([2, 3])
+      allow(board).to receive(:empty_col?).with(2).and_return(true)
+      allow(game).to receive(:gets).and_return("2\n")
+      expect(game.prompt).to eq('2')
     end
 
     it 'rejects invalid column input and asks again' do
-      allow(board).to receive(:empty_cell?).with(2, 3).and_return(true)
-      allow(game).to receive(:gets).and_return("2\n", "10\n", "3\n")
-      expect(game.prompt).to eq([2, 3])
+      allow(board).to receive(:empty_col?).with(2).and_return(true)
+      allow(game).to receive(:gets).and_return("10\n", "2\n")
+      expect(game.prompt).to eq('2')
     end
 
     it 'rejects occupied positions and asks again' do
-      allow(game).to receive(:gets).and_return("2\n", "3\n", "2\n", "3\n")
-      allow(board).to receive(:empty_cell?).with(2, 3).and_return(false, true) # First call = occupied, second call = valid
-      expect(game.prompt).to eq([2, 3]) # Expect only the final valid input
+      allow(game).to receive(:gets).and_return("2\n", "2\n")
+      allow(board).to receive(:empty_col?).with(2).and_return(false, true) # First call = occupied, second call = valid
+      expect(game.prompt).to eq('2') # Expect only the final valid input
     end
   end
+
+  # Add play_round test
 end

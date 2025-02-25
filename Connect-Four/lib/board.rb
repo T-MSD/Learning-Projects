@@ -31,8 +31,8 @@ class Board
     @board.flatten.all?(&:nil?)
   end
 
-  def empty_cell?(row, col)
-    @board[row][col].nil?
+  def empty_col?(col)
+    @board[0][col].nil?
   end
 
   def reset_board

@@ -2,18 +2,29 @@
 
 # Class Game
 class Game
-  attr_reader :winner, :board, :p1, :p2
+  attr_reader :board, :p1, :p2
 
-  def initialize(board, player1 = nil, player2 = nil)
+  def initialize(board, player1, player2)
     @board = board
-    @winner = nil
     @p1 = player1
     @p2 = player2
   end
 
   def reset
     @board.reset_board
-    @winner = nil
+    play
+  end
+
+  def reset?
+    puts 'Start a new game?'
+    input = gets.chomp
+    until %w[yes no].include?(input)
+      puts 'Type either yes or no.'
+      input = gets.chomp
+    end
+    return false if input == 'no'
+
+    true if input == 'yes'
   end
 
   def check_four?(row, col, r_dir, c_dir, color)
@@ -36,29 +47,51 @@ class Game
     false
   end
 
-  # TODO: Refactor this func
-  def prompt
-    text = ['Enter row:', 'Enter column:']
-    coord = []
-    i = 0
-    while i < 2
-      puts text[i]
-      input = gets.chomp
-      if i.zero? && input.to_i.between?(0, 5)
-        i += 1
-        coord.append(input.to_i)
-      elsif i == 1 && input.to_i.between?(0, 6)
-        i += 1
-        coord.append(input.to_i)
-        unless @board.empty_cell?(coord[0], coord[1])
-          i = 0
-          coord = []
-          puts 'Position not empty!'
-        end
-      else
-        puts 'Invalid number, row between 0 and 5, column between 0 and 6'
-      end
+  def valid_input?(input)
+    if !input.to_i.between?(0, 6)
+      puts 'Invalid number, column has to be a number between 0 and 6.'
+      return false
+    elsif !@board.empty_col?(input)
+      puts 'Column is already full!'
+      return false
     end
-    coord
+    true
+  end
+
+  def prompt
+    puts 'Enter col:'
+    c = gets.chomp
+    until valid_input?(c.to_i)
+      puts 'Enter col:'
+      c = gets.chomp
+    end
+    c.to_i
+  end
+
+  def play_round
+    players = [@p1, @p2]
+    turn = 0
+    loop do
+      if @board.board_full?
+        puts "It's a tie!"
+        break
+      end
+      col = prompt
+      current_player = players[turn % 2]
+      @board.place(col, current_player.color)
+      @board.print_board
+      if win?(current_player.color)
+        puts "#{current_player.color} Wins!"
+        break
+      end
+      turn += 1
+    end
+  end
+
+  def play
+    puts 'First player -> Red color'
+    puts 'Second player -> Blue color'
+    play_round
+    reset if reset?
   end
 end
