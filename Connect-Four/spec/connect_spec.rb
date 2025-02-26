@@ -176,21 +176,55 @@ describe Game do
     it 'returns valid row and column when input is correct' do
       allow(board).to receive(:empty_col?).with(2).and_return(true)
       allow(game).to receive(:gets).and_return("2\n")
-      expect(game.prompt).to eq('2')
+      expect(game.prompt).to eq(2)
     end
 
     it 'rejects invalid column input and asks again' do
       allow(board).to receive(:empty_col?).with(2).and_return(true)
       allow(game).to receive(:gets).and_return("10\n", "2\n")
-      expect(game.prompt).to eq('2')
+      expect(game.prompt).to eq(2)
     end
 
     it 'rejects occupied positions and asks again' do
       allow(game).to receive(:gets).and_return("2\n", "2\n")
       allow(board).to receive(:empty_col?).with(2).and_return(false, true) # First call = occupied, second call = valid
-      expect(game.prompt).to eq('2') # Expect only the final valid input
+      expect(game.prompt).to eq(2) # Expect only the final valid input
     end
   end
 
-  # Add play_round test
+  describe Game do
+    player1 = Player.new('🔴')
+    player2 = Player.new('🔵')
+    board = Board.new
+    game = Game.new(board, player1, player2)
+
+    before do
+      allow(board).to receive(:print_board)
+      allow(board).to receive(:place)
+    end
+
+    context 'when a player wins' do
+      it 'declares the winner and stops the game' do
+        allow(board).to receive(:board_full?).and_return(false)
+        allow(board).to receive(:empty_col?).with(0).and_return(true)
+
+        # Simulate user input for column 0 every turn
+        allow_any_instance_of(Kernel).to receive(:gets).and_return('0')
+
+        # Simulate winning condition
+        allow(game).to receive(:win?).with('🔴').and_return(false, false, true)
+        allow(game).to receive(:win?).with('🔵').and_return(false)
+
+        expect { game.play_round }.to output(/🔴 Wins!/).to_stdout
+      end
+    end
+
+    context 'when the game is a tie' do
+      it 'declares a tie and stops the game' do
+        allow(board).to receive(:board_full?).and_return(true)
+
+        expect { game.play_round }.to output(/It's a tie!/).to_stdout
+      end
+    end
+  end
 end
