@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Document</title>
+</head>
+<body>
+  <div class="left">
+    <div class="odin-container">
+      <img clas="odin-img" src="img/odin-lined.png">
+      <div class="odin-text">
+        <p>ODIN</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="right-top">
+      <p>This is not a real online service! You know you need something like this in 
+      your life to help you realize your deepest dreams.</p>
+      <p class="right-top-big">Sign up <i>now</i> to get started.</p>
+      <p>You <i>know</i> you want to.</p>
+    </div>
+    <div class="form-container">
+      <p class="form-text">Let's do this!</p>
+
+      <div class="row">
+        <form>
+          <label for="first_name">FIRST NAME</label>
+          <input type="text" id="first_name" required>
+        </form>
+        <form>
+          <label for="last_name">LAST NAME</label>
+          <input type="text" id="last_name" required>
+        </form>
+      </div>
+
+      <div class="row">
+        <form>
+          <label for="email">EMAIL</label>
+          <input type="email" id="email" required>
+        </form>
+        <form>
+          <label for="phone">PHONE NUMBER</label>
+          <input type="tel" id="phone" pattern="[0-9]{10}" required>
+        </form>
+      </div>
+
+      <div class="row">
+        <form>
+          <label for="password">PASSWORD</label>
+          <input type="password" id="password" required>
+        </form>
+        <form>
+          <label for="confirm_password">CONFIRM PASSWORD</label>
+          <input type="password" id="confirm_password" required>
+        </form>
+      </div>
+
+    </div>
+    <div class="right-footer">
+      <button class="create-btn" type="submit">Create Account</button>
+      <div class="footer-text">
+        <p>Already have an account?</p>
+        <p class="log-in-text">Log in</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
